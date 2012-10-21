@@ -1,121 +1,129 @@
-﻿//----------------------------------------------------------
-//  easelTextFX - TextField Animation Script
+//----------------------------------------------------------
+//  easelTextFX - TextFX V1 - Animate createJS.Text objects.
 //  k-lock.de - 15/09/2012
-//
-(function () {
 
-    /** Init
+(function () {
+    //------------------------------------------------------------------------------    CONSTRUCTOR
+    /** TextFX Constructor
     *   @param tf    - A source createjs.text element. 
-    *   @param delay - A timer value to wait before start.*/
+    *   @param typ   - A typ for letter splitting. Split type[ "char" , "word" ]
+    *   @param delay - A timer value to wait before start the animation tween.*/
     var TextFX = function (tf, typ, delay) {
-        if (arguments.length) this.initialize(tf, typ, delay);
+        if (arguments.length){
+            this.initialize(tf, typ, delay);
+        }
     }
     var p = TextFX.prototype = new createjs.Container();
-
-    /** Static method to create a easel Text object
+    
+    //------------------------------------------------------------------------------    STATIC METHODS
+    /** Short method to create a easel Text object in one line.
     *       
     *   @param text - The text string.
     *   @param x - position x.
     *   @param y - position y.
     *   @param font - The style for the text field.
     *
-    *   Returns a new createjs.Text element.*/
+    *   Returns a new createjs.Text object.*/
     TextFX.createTF = function (text, x, y, font) {
 
         var tf = new createjs.Text(text, (font!=undefined)?font:"20px Arial", "#000");
-            tf.textBaseline = "middle";
-            tf.textAlign = "center";
-            tf.setTransform(x, y)
-       
+        tf.textBaseline = "middle";
+        tf.textAlign = "center";
+        tf.setTransform(x, y)
         return tf
     }
-
+    //------------------------------------------------------------------------------    STATIC PROPERTIES
     /** Split type: words - To animate a full word.*/
     TextFX.SPLIT_WORD = "word"
     /** Split type: characters- To animate every letter for itself. */
     TextFX.SPLIT_CHAR = "char"
-
+    //------------------------------------------------------------------------------    INITIALIZER
     p.Container_initialize = p.initialize;
     p.initialize = function (tf, typ, delay) {
-        this.Container_initialize();
-
-        var self = this;
-        /** To offset the registration point by a certain number of pixels along its x-axis**/
-        var $regX;
-        /** To offset the registration point by a certain number of pixels along its y-axis**/
-        var $regY;
-        /** The source TextField that gets split **/
+       
+        /** The letter animation function. Build to use with the fantastic tween
+         *  class of createJS. Method can replace with an own tween command function.
+         *  @param _char  - The text object to animate.
+         *  @param _index - The child index in the parent object.
+         *  
+         *  Returns a new Tween instance. To can use the createJS.call method.*/
+        this.tween = function(_char, _index){}  //return createjs.tween()
+        /** Helper object - reference to this. */
+        var $self = this;
+        /** The source TextField that gets split */
         var $source = tf;
-        /** Determines the way in which the source TextField is splitin - either by characters, words, or lines. <li>SPLIT_CHAR <li>SPLIT_WORD <li>SPLIT_LINE **/
-        var $type = typ = "char";
-
-        this.setTransform($source.x, $source.y);
-        //     console.log("Source Rect : ",$source.x, $source.y, $source.getMeasuredWidth(), $source.getMeasuredHeight());
-
-        /* var g = new createjs.Graphics();
-           g.beginFill(createjs.Graphics.getRGB(200, 200, 200, .8)).drawRect(0, 0, $source.getMeasuredWidth(), $source.getMeasuredHeight());
-   
-           this.debugShape = debugShape = new createjs.Shape(g)
-         //  this.addChild(debugShape)*/
-
+        /** Determines the way in which the source TextField is splitin -
+         *  either by characters, words, or lines. <li>SPLIT_CHAR <li>SPLIT_WORD <li>SPLIT_LINE */
+        var $type = typ != undefined ? typ : TextFX.SPLIT_CHAR;
+        /** Helper value for setTimeout Interval.*/
+        var interID = undefined;
+        delay = delay != undefined ? delay : 0;
         if (delay != undefined)
-            window.setTimeout(splitCharacters, delay);
+            interID = window.setTimeout(splitCharacters, delay);
         else
             splitCharacters();
+        
+        //initialize and set position
+        this.Container_initialize();
+        this.setTransform($source.x, $source.y);
+        
+        //------------------------------------------------------------------------- Private Methods
+        /** Split string characters to an array and create for every letter / or 
+         *  word [$type] a createjs.Text instance. Finaly start to tween chars with the 
+         *  current tween function.[this.tween] */
+       function splitCharacters() {
 
-        function splitCharacters() {
-
-            var word = $source.text
+            if( interID != undefined ) window.clearTimeout(interID);            
+            
+            var _outline  = $source.outline;      
+            var _color    = $source.color;   
+            var _font     = $source.font;
+            
+            var word      = $source.text             
             var wordWidth = 0;
-            var wordList = word.split(($type == "word") ? " " : "")
-            var _outline = $source.outline;
-            var _color = $source.color;
+            var wordList  = word.split(($type == TextFX.SPLIT_WORD) ? " " : "")
 
             for (var i = 0; i < wordList.length; i++) {
 
                 if (wordList[i] !== " ") {
 
-                    var char = TextFX.createTF(wordList[i], 0,0, $source.font);
-                    var letterWidth = char.getMeasuredWidth();
+                    var _char = TextFX.createTF(wordList[i], 0,0, _font);
+                    var letterWidth = _char.getMeasuredWidth();
                    
-                    char.setTransform( wordWidth + $source.x + (letterWidth * .5), $source.y);
-                    char.outline = _outline;
-                    char.alpha = 0;
-                    char.color = _color;
-                    if ($source.shadow != undefined) char.shadow = $source.shadow.clone();
-
-                    //  debugShape.graphics.beginStroke(createjs.Graphics.getRGB(0, 0, 0)).drawRect(wordWidth + x, y-25, letterWidth, 50);
+                    _char.setTransform( wordWidth + $source.x + (letterWidth * .5), $source.y);
+                    _char.outline = _outline;
+                    _char.color = _color;
+                    
+                    if ($source.shadow != undefined) _char.shadow = $source.shadow.clone();
 
                     wordWidth += letterWidth;
 
-                    self.addChild(char);
-
-                    createjs.Tween.get(char)
-    
-                        .wait((200 * i) + 100)
-                        
-                        .to({ scaleX: 5, scaleY: 5, alpha: .50 }, 120)
-                        .to({ scaleX: 1, scaleY: 1, alpha: 1 }, 90)
-                        .call(cleaner, [char, i])
+                    $self.addChild(_char);
+                    $self.tween(_char, i).call( cleaner, [i, wordWidth]);
                 }
-            }
-            function cleaner(char, i) {
-
-                if (i == wordList.length - 1) {
-
-                    for (var i = 0; i < wordList.length; i++) self.removeChild(self.getChildAt(0))
-                    createjs.Tween.removeTweens(char)
-
-                    $source.setTransform($source.x + wordWidth * .5, $source.y);
-                    self.addChild($source);
-
-                }
-
             }
         }
-
+        /** Tween cleaner method. Called when teen has finished.
+         *  To clear tween and createjs.Text object. 
+         *  @param _index - The child index in the parent object.
+         *  @param _wordWidth - The current width in word. Helper to position the finish full text object.*/
+        var cleaner = function (i, _wordWidth) {
+           var n = $self.getNumChildren();
+           if (i == n-1) {           
+                for (var r = 0; r < n; r++){  
+                    var letter = $self.getChildAt(0);
+                    
+                    createjs.Tween.removeTweens(letter)
+                    $self.removeChild(letter)
+                }
+                
+                // add the real textfield to finish animation process
+                $source.setTransform($source.x + _wordWidth * .5, $source.y);
+                $self.addChild($source);            
+  
+            }
+        }
     }
-
     window.TextFX = TextFX;
 }());
 
