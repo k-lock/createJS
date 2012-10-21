@@ -1,21 +1,107 @@
-﻿<html>
-<head>
-    <meta "Content-Type" charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=9" />
-    <title>easelTextFX V1</title>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>CreateJS TextFX V1</title>
+        <script src="libs/easeljs-0.5.0.min.js"></script>
+        <script src="libs/tweenjs-0.3.0.min.js"></script>
+        
+        <script src="js/easelTextFX-1.js"></script>
+        <script src="js/kFPS.js"></script>
+        <style>
+            #canvas {
+                background-color:rgb(22,22,22)
+            }
+        </style>
+        <script>
+            var canvas, stage,c,s;
+
+            function init_TF() {
+
+                // setup canvas
+                canvas = document.getElementById("canvas");
+                canvas.width = window.innerWidth - 20;
+                canvas.height = window.innerHeight - 100;
+
+                // create stage instance
+                stage = new createjs.Stage(canvas);
+   
+                // setup ticker
+                createjs.Ticker.useRAF = true;
+                createjs.Ticker.setFPS(60);
+                createjs.Ticker.addListener(window)
+
+                // create a fps display
+                fps = new kFPS(canvas.width - 60, 20);
+                fps.shadow=null
+                fps.color = "#fff"
+
+                // setup source textfields with position, style, color and shadow
+                var tf1 = TextFX.createTF("easel", 150, 50, "90px Arial");      
+                var tf2 = TextFX.createTF("Text", 255, 50,"bold 90px Arial")
+                var tf3 = TextFX.createTF("FX", 345, 50, "90px Arial")
     
-    <script src="libs/easeljs-0.5.0.min.js"></script>
-    <script src="libs/tweenjs-0.3.0.min.js"></script>
-    <script src="js/easelTextFX-1.js"></script>
-    <script src="js/TextSamples.js"></script>
-    <script src="js/kFPS.js"></script>
-    <style>
-        #canvas {
-            background-color:rgb(22,22,22)
-        }
-    </style>
-</head>
-<body  onload="init_TF()">
-    <canvas id="canvas" ></canvas>
-</body>
+                tf1.outline = true;
+                tf1.color = tf3.color = tf2.color = "#fff"
+                tf1.shadow = tf3.shadow = new createjs.Shadow("#ffffff", 0, 2, 10);
+
+                // create new TextFX instance with textfield, splitModeType, delay
+                var tfx1 = new TextFX(tf1 );
+                var tfx2 = new TextFX(tf2, TextFX.SPLIT_WORD, 1000);
+                var tfx3 = new TextFX(tf3, TextFX.SPLIT_CHAR, 1400);
+    
+                // create a tween command method and set to the TextFX instance
+                tfx1.tween = tfx3.tween = function(_char,index){
+                    return createjs.Tween.get(_char)   
+                    .to({alpha:0},1)
+                    .wait((200 * index) + 100)   
+                    .to({
+                        scaleX: 5, 
+                        scaleY: 5, 
+                        alpha: .50
+                    }, 120)
+                    .to({
+                        scaleX: 1, 
+                        scaleY: 1, 
+                        alpha: 1
+                    }, 90)             
+                }
+
+                tfx2.tween = function(_char,index){
+                    return createjs.Tween.get(_char)  
+        
+                    .wait((200 * index) + 100)    
+                    .to({alpha:0, rotation:360},0)
+                    .to({
+                        //       rotation:0,
+                        scaleX: 5, 
+                        scaleY: 5, 
+                        alpha: .50
+                    }, 120)
+                    .to({
+                        rotation:0,
+                        scaleX: .1, 
+                        scaleY: .1, 
+                        alpha: 1
+                    }, 200)    
+                    .to({
+                        //        rotation:0,
+                        scaleX: 1, 
+                        scaleY: 1, 
+                        alpha: 1
+                    }, 100)  
+                }
+                // adding object to stage
+                stage.addChild(tfx1,tfx2,tfx3,fps)
+
+                stage.update();
+            }
+            function tick() {
+                fps.updateTF(); // Fps display update method
+                stage.update();
+            }
+        </script>
+    </head>
+    <body  onload="init_TF()">
+        <canvas id="canvas" ></canvas>
+    </body>
 </html>
