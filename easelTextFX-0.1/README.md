@@ -1,8 +1,10 @@
 # easelTextFX V1
 
-Textfield Animation Experiment
+TextFX splits a TextField in its string chars -
+created for every char an TextField instance and 
+added it to the display list.
 
-Splits a text string in chars and animate it.
+Code Example
 
 				// setup source textfields with position, style, color and shadow
                 var tf1 = TextFX.createTF("easel", 150, 50, "90px Arial");      
@@ -16,7 +18,7 @@ Splits a text string in chars and animate it.
                 // create new TextFX instance with textfield, splitModeType, delay
                 var tfx1 = new TextFX(tf1 );
                 var tfx2 = new TextFX(tf2, TextFX.SPLIT_WORD, 1000);
-                var tfx3 = new TextFX(tf3, TextFX.SPLIT_CHAR, 1400);
+                var tfx3 = new TextFX(tf3, TextFX.SPLIT_CHAR, 1400, true);
     
                 // create a tween command method and set to the TextFX instance
                 tfx1.tween = tfx3.tween = function(_char,index){
