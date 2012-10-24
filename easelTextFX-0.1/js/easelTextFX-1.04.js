@@ -5,7 +5,7 @@
  *
  *  TODO: 
  *      Split horizontal textfields 
- *      Split textfields with space
+ *      Split textfields with space - position the letter after a space | wordwarp
  * 
  */  
  /*  Updates:
@@ -101,6 +101,8 @@
             for (var i = 0; i < end; i++) {
                 if (wordList[i] !== " ") {
                     calcWidth += this._createLetter(false, wordList[i], calcWidth)
+                } else {
+                    calcWidth += this.getSpaceWidth();
                 }
             }
         } else {
@@ -108,10 +110,18 @@
             for (var i = end - 1; i >= 0; i--) {
                 if (wordList[i] !== " ") {
                     calcWidth -= this._createLetter(true, wordList[i], calcWidth)
+                } else {
+                    calcWidth -= this.getSpaceWidth();
                 }
             }
         }
         this._tweenStart();
+    }
+    /** Calculate the width of the letter M, to get a value in the current text format.*/
+    p.getSpaceWidth = function(){
+        var t = this.source.clone();
+        t.text="M";
+        return t.getMeasuredWidth()*.333;
     }
     /** Create a Textfield for a char.
     *   @param reverse - Animation playmode.
@@ -184,10 +194,10 @@
     p.tween = function (c, i) {
         return createjs.Tween.get(c)
                  .to({ alpha: 0 }, 1)
-                 .wait((250 * i) + 100)
+                 .wait((180 * i) + 100)
                  .to({
                      alpha: 1
-                 }, 150)
+                 }, 100)
     }
     /** To catch the moment where the tweener is ready. You can define outside a own method to handle stuff.*/
     p.onComplete = function () { }
