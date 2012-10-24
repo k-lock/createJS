@@ -1,0 +1,242 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>TextFX-MultiCanWars</title>
+        <script src="libs/easeljs-0.5.0.min.js"></script>
+        <script src="libs/tweenjs-0.3.0.min.js"></script>
+
+        <script src="js/easelTextFX-1.04.js"></script>
+        <script src="js/easelFPS.js"></script>
+        <style>
+            #canvas {
+                background-color:rgb(22,22,22);
+                position:absolute;
+                width:700px;
+                height: 200px;
+            }
+            #canvas2 {
+                background-color:rgb(242,242,242);
+                position:absolute;
+                top:200px;
+                width:700px;
+                height: 200px;
+            }
+            #canvas3 {
+                background-color:rgb(140,140,140);
+                position:absolute;
+                left:720px;
+                width: 150px;
+                height: 500px;
+            }
+        </style>
+        <script>
+            var canvas3, stage3,fps3;
+            var canvas2, stage2,fps2;
+            var canvas, stage,fps;
+           /*
+            * TODO :
+            * 
+            *   Horizontal Text Animation
+           
+            function init_TF3() {
+
+                // setup canvas
+                canvas3 = document.getElementById("canvas3");
+                canvas3.width = 150//window.innerWidth - 20;
+                canvas3.height = 500//window.innerHeight - 100;
+      
+                // create stage instance
+                stage3 = new createjs.Stage(canvas3);
+     
+                // create a fps display
+                fps3 = new easelFPS(canvas3.width-50, 5);
+                fps3.shadow=null
+                fps3.color = "#000"
+                // setup source textfields with position, style, color and shadow
+                var tf1 = TextFX.createTF("e a s e l", "90px Arial", "#000", "center").setTransform(75,25);  
+                var tf2 = TextFX.createTF("F X", "bold 90px Arial", "#000", "center").setTransform(75,385);  
+                tf1.maxWidth = tf2.maxWidth = 70
+                tf1.lineWidth = tf2.lineWidth = 60
+                tf1.lineHeight = tf2.lineHeight = 70
+                tf1.outline = true;
+                tf1.shadow = tf2.shadow = new createjs.Shadow("#333", 0, 2, 10);
+                // adding object to stage
+               
+                var tfx1 = new TextFX(tf1 );
+                var tfx2 = new TextFX(tf2, TextFX.SPLIT_WORD, 1000);
+                
+                 stage3.addChild(tfx1,tfx2,fps3)
+                
+            } */
+            function init_TF2() {
+
+                // setup canvas
+                canvas2 = document.getElementById("canvas2");
+                canvas2.width = 700//window.innerWidth - 20;
+                canvas2.height = 200//window.innerHeight - 100;
+      
+                // create stage instance
+                stage2 = new createjs.Stage(canvas2);
+     
+                // create a fps display
+                fps2 = new easelFPS(canvas2.width - 60, 20);
+                fps2.shadow=null
+                fps2.color = "#000"
+                // setup source textfields with position, style, color and shadow
+                
+                var tf1 = TextFX.createTF("easel", "90px Arial", "#222", "left").setTransform(50,90);     
+                var tf2 = TextFX.createTF("Text", "bold 90px Arial", "#222", "left").setTransform(265,90);
+                var tf3 = TextFX.createTF("FX", "bold 90px Arial", "#222", "top").setTransform(450,90);
+    
+                tf1.outline = true;
+                tf1.shadow = tf3.shadow = new createjs.Shadow("#333", 0, 2, 10);
+
+                // create new TextFX instance with textfield, splitModeType, delay
+                var tfx1 = new TextFX(tf1, TextFX.SPLIT_CHAR, 1200, true);
+                var tfx2 = new TextFX(tf2, TextFX.SPLIT_WORD, 1000);
+                var tfx3 = new TextFX(tf3, TextFX.SPLIT_CHAR, 0, true);
+                // create a tween command method and set to the TextFX instance
+                tfx1.tween = tfx3.tween = function(_char,index){
+                    return createjs.Tween.get(_char)   
+                    .to({alpha:0},1)
+                    .wait((250 * index) + 100)   
+                    .to({
+                        scaleX: 5, 
+                        scaleY: 5, 
+                        alpha: .50
+                    }, 150)
+                    .to({
+                        scaleX: 1, 
+                        scaleY: 1, 
+                        alpha: 1
+                    }, 110)             
+                }
+
+                tfx2.tween = function(_char,index){
+                    return createjs.Tween.get(_char)  
+        
+                    .wait((200 * index) + 100)    
+                    .to({alpha:0, rotation:360},0)
+                    .to({
+                        //       rotation:0,
+                        scaleX: 5, 
+                        scaleY: 5, 
+                        alpha: .50
+                    }, 120)
+                    .to({
+                        rotation:0,
+                        scaleX: .1, 
+                        scaleY: .1, 
+                        alpha: 1
+                    }, 200)    
+                    .to({
+                        //        rotation:0,
+                        scaleX: 1, 
+                        scaleY: 1, 
+                        alpha: 1
+                    }, 100)  
+                }
+                // adding object to stage
+                stage2.addChild(tfx1,tfx2,tfx3,fps2)
+            }
+            
+            //---------------------------------------------------------------------------------CANVAS 0
+            
+
+            function init_TF() {
+                
+                init_TF2() 
+            //    init_TF3() 
+                // setup canvas
+                canvas = document.getElementById("canvas");
+                canvas.width = 700//window.innerWidth - 20;
+                canvas.height = 200//window.innerHeight - 100;
+
+                // create stage instance
+                stage = new createjs.Stage(canvas);
+   
+                // setup ticker
+                createjs.Ticker.useRAF = true;
+                createjs.Ticker.setFPS(60);
+                createjs.Ticker.addListener(window)
+
+                // create a fps display
+                fps = new easelFPS(canvas.width - 60, 20);
+                fps.shadow=null
+                fps.color = "#fff"
+
+                // setup source textfields with position, style, color and shadow
+                var tf1 = TextFX.createTF("easel", "90px Arial", "#fff", "left").setTransform(50,90);     
+                var tf2 = TextFX.createTF("Text", "bold 90px Arial", "#fff", "left").setTransform(265,90);
+                var tf3 = TextFX.createTF("FX", "bold 90px Arial", "#fff", "top").setTransform(450,90);
+    
+                tf1.outline = true;
+                tf1.shadow = tf3.shadow = new createjs.Shadow("#ffffff", 0, 2, 10);
+
+                // create new TextFX instance with textfield, splitModeType, delay
+                var tfx1 = new TextFX(tf1 );
+                var tfx2 = new TextFX(tf2, TextFX.SPLIT_WORD, 1000);
+                var tfx3 = new TextFX(tf3, TextFX.SPLIT_CHAR, 1200, true);
+    
+                // create a tween command method and set to the TextFX instance
+                tfx1.tween = tfx3.tween = function(_char,index){
+                    return createjs.Tween.get(_char)   
+                    .to({alpha:0},1)
+                    .wait((250 * index) + 100)   
+                    .to({
+                        scaleX: 5, 
+                        scaleY: 5, 
+                        alpha: .50
+                    }, 150)
+                    .to({
+                        scaleX: 1, 
+                        scaleY: 1, 
+                        alpha: 1
+                    }, 110)             
+                }
+
+                tfx2.tween = function(_char,index){
+                    return createjs.Tween.get(_char)  
+        
+                    .wait((200 * index) + 100)    
+                    .to({alpha:0, rotation:360},0)
+                    .to({
+                        //       rotation:0,
+                        scaleX: 5, 
+                        scaleY: 5, 
+                        alpha: .50
+                    }, 120)
+                    .to({
+                        rotation:0,
+                        scaleX: .1, 
+                        scaleY: .1, 
+                        alpha: 1
+                    }, 200)    
+                    .to({
+                        //        rotation:0,
+                        scaleX: 1, 
+                        scaleY: 1, 
+                        alpha: 1
+                    }, 100)  
+                }
+                // adding object to stage
+                stage.addChild(tfx1,tfx2,tfx3,fps)
+                stage.update();
+            }
+            function tick() {
+               
+                if(fps!=undefined)   fps.updateTF(); 
+                if(fps2!=undefined)  fps2.updateTF();
+                if(fps3!=undefined)  fps3.updateTF();
+                if(stage!=undefined)  stage.update(); 
+                if(stage2!=undefined)  stage2.update();
+                if(stage3!=undefined)  stage3.update();
+            }
+        </script>
+    </head>
+    <body  onload="init_TF()">
+        <canvas id="canvas" ></canvas>
+        <canvas id="canvas2" ></canvas>
+   <!--     <canvas id="canvas3" ></canvas>-->
+    </body>
+</html>
